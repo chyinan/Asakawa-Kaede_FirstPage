@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asakawa Kaede | Sound & Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Introduced Lora (Serif) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Noto+Sans+SC:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        studio: {
+                            bg: '#121214',
+                            panel: '#18181b',
+                            border: '#27272a',
+                            text: '#e4e4e7',
+                            muted: '#a1a1aa',
+                            warm: '#d4b483', 
+                            warmGlow: '#d4b483', // Explicit glow color
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        serif: ['Lora', 'serif'], // Added serif for narrative
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulseSlow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite', // For ambient light
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseSlow: {
+                            '0%, 100%': { opacity: '0.3', transform: 'scale(1)' },
+                            '50%': { opacity: '0.5', transform: 'scale(1.1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #121214; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+        
+        body {
+            background-color: #121214;
+            color: #e4e4e7;
+            /* Noise texture */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        .lang-hidden {
+            display: none !important;
+        }
+
+        /* Ambient Light Orb */
+        .ambient-light {
+            position: fixed;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 60vh;
+            background: radial-gradient(circle, rgba(212, 180, 131, 0.08) 0%, rgba(18, 18, 20, 0) 70%);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(60px);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-studio-warm selection:text-studio-bg relative">
+
+    <!-- Background Ambient Light -->
+    <div class="ambient-light animate-pulse-slow"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 backdrop-blur-sm border-b border-white/5 py-4">
+        <div class="max-w-4xl mx-auto px-6 flex justify-between items-center text-xs tracking-widest font-mono text-studio-muted">
+            <span class="font-medium text-studio-text tracking-[0.15em]">ASAKAWA KAEDE</span>
+            <div class="flex items-center space-x-6">
+                <a href="#about" class="hover:text-studio-warm transition-colors duration-300 hidden md:inline-block">ABOUT</a>
+                <a href="#projects" class="hover:text-studio-warm transition-colors duration-300 hidden md:inline-block">PROJECTS</a>
+                <a href="#audio" class="hover:text-studio-warm transition-colors duration-300 hidden md:inline-block">AUDIO</a>
+                
+                <!-- Language Toggle -->
+                <button id="lang-toggle" class="border border-white/10 px-2 py-1 rounded hover:border-studio-warm hover:text-studio-warm transition-all duration-300">
+                    <span class="data-lang-zh">EN</span>
+                    <span class="data-lang-en lang-hidden font-sans">中</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. Hero Section -->
+    <section class="min-h-screen flex flex-col justify-center items-center px-6 relative">
+        <div class="w-full max-w-4xl text-center space-y-8 opacity-0 animate-[fadeInUp_1s_ease-out_0.5s_forwards]">
+            <p class="font-mono text-studio-warm text-xs tracking-[0.2em] uppercase opacity-80">System Online</p>
+            <!-- Changed to Serif -->
+            <h1 class="font-serif text-3xl md:text-5xl font-normal leading-tight tracking-wide text-studio-text italic mx-auto">
+                <span class="data-lang-zh">构建逻辑的骨架，<br>填充温度的声音。</span>
+                <span class="data-lang-en lang-hidden block">Structuring code with reason,<br>mixing audio with emotion.</span>
+            </h1>
+            <p class="text-studio-muted text-sm md:text-base font-light tracking-wide max-w-md mx-auto pt-4 leading-relaxed font-sans">
+                <span class="data-lang-zh">Structuring code with reason, mixing audio with emotion.</span>
+                <span class="data-lang-en lang-hidden">Engineering Logic, Analog Soul.</span>
+            </p>
+        </div>
+        
+        <!-- Scroll Hint -->
+        <div class="absolute bottom-12 animate-bounce duration-[3000ms] text-studio-muted/30 text-xs font-mono">
+            SCROLL TO EXPLORE
+        </div>
+    </section>
+
+    <main class="max-w-3xl mx-auto px-6 space-y-32 pb-32">
+
+        <!-- 2. About Section -->
+        <section id="about" class="space-y-8 scroll-mt-32">
+            <h2 class="text-xs font-mono text-studio-muted tracking-widest border-b border-white/5 pb-2 uppercase">01 / Profile</h2>
+            <!-- Added font-serif to prose -->
+            <div class="prose prose-invert prose-p:font-serif prose-p:text-studio-muted prose-p:leading-8 prose-p:text-lg">
+                <div class="data-lang-zh">
+                    <p>
+                        你好，我是ASAKAWA KAEDE，你也可以叫我枫。
+                    </p>
+                    <p>
+                        我不会把自己定义为传统的全栈开发者。
+                    </p>
+                    <p>
+                        比起堆砌代码，我更着迷于捕捉灵感爆发的瞬间。
+                    </p>
+                    <p>
+                        工作流通常始于一个稍纵即逝的灵感——我试图将其描绘并创造为现实。
+                    </p>
+                    <p>
+                        我不喜欢按部就班，而是追求在结构中表达出流动的生命力，
+                    </p>
+                    <p> 
+                        在理性构建的世界里，试着去保留那份感性的冲动。
+                    </p>
+                </div>
+                <div class="data-lang-en lang-hidden">
+                    <p>
+                        Hello, my name is ASAKAWA KAEDE, you can also call me KAEDE.
+                    </p>
+                    <p>
+                        I do not define myself as a traditional full-stack developer.
+                    </p>
+                    <p>
+                        Rather than just stacking code, I am more obsessed with capturing the moment when inspiration strikes.
+                    </p>
+                    <p>
+                        My workflow usually begins with a fleeting idea—I attempt to sketch it out and bring it into reality.
+                    </p>
+                    <p>
+                        Refusing to follow the beaten path, I pursue the vitality that flows within the structure.
+                    </p>
+                    <p>
+                        In this rationally constructed world, I try to retain that emotional impulse.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Skills Section -->
+        <section class="space-y-8">
+            <h2 class="text-xs font-mono text-studio-muted tracking-widest border-b border-white/5 pb-2 uppercase">02 / Capabilities</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Rational / Tech Stack (Left Column) -->
+                <div class="space-y-8">
+                    <!-- Languages -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-mono text-studio-muted/70 tracking-wider uppercase">Languages</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Dart (Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-blue-500/30 bg-blue-500/5 text-blue-400 text-xs font-mono hover:bg-blue-500/10 hover:shadow-[0_0_10px_-3px_rgba(59,130,246,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M4.175 0l15.65 15.65-4.174 4.175-15.65-15.65zM9.392 5.216l10.433 10.432 4.175-4.175-10.433-10.433z"/></svg>
+                                DART
+                            </div>
+                            <!-- JavaScript (Yellow) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-xs font-mono hover:bg-yellow-500/10 hover:shadow-[0_0_10px_-3px_rgba(234,179,8,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M24 22.525H0V1.475h24v21.05zm-1.616-9.108c0-3.376-2.596-5.463-6.522-5.463-2.126 0-3.837.575-5.074 1.15l.89 3.327c1.076-.55 2.37-1.125 3.52-1.125 1.585 0 2.308.675 2.308 1.625v.375c-3.837.225-6.57 1.35-6.57 4.175 0 1.95 1.487 3.025 3.617 3.025 1.684 0 2.808-.775 3.37-1.875h.123v1.65h3.338v-6.85c0-.025 0-.05 0-.025zm-3.616 3.65c-.05.85-.718 1.4-1.637 1.4-1.002 0-1.564-.6-1.564-1.575 0-1.1 1.052-1.85 2.877-1.95v2.125zm-8.878-9.05c-3.115 0-5.222 1.95-5.222 5.25v6.525h3.69V13.3c0-1.625.866-2.45 2.25-2.45.965 0 1.636.5 1.636 1.475v7.45h3.69v-8.225c0-3.1-1.93-4.525-4.508-4.525-1.583 0-2.825.7-3.39 1.65h-.148v-1.4h-3.32z"/></svg>
+                                JAVASCRIPT
+                            </div>
+                            <!-- TypeScript (Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-blue-600/30 bg-blue-600/5 text-blue-400 text-xs font-mono hover:bg-blue-600/10 hover:shadow-[0_0_10px_-3px_rgba(37,99,235,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0H1.125zM11.523 16.035c.78.337 1.25.688 1.25 1.258 0 .614-.623 1.05-1.536 1.05-.85 0-1.78-.328-2.5-.679l-.515 2.118c.95.46 2.285.736 3.235.736 2.45 0 3.93-1.258 3.93-3.41 0-2.42-3.15-3.048-3.15-4.43 0-.54.49-.868 1.434-.868.83 0 1.63.22 2.185.503l.537-2.07c-.83-.418-2.022-.65-3.05-.65-2.28 0-3.797 1.218-3.797 3.328 0 2.27 3.167 2.82 3.167 4.398-1.19.467-2.61.168-1.19-.168zm-5.71-6.195H3.008v2.102h2.805v8.32h2.518v-8.32h2.805v-2.1z"/></svg>
+                                TYPESCRIPT
+                            </div>
+                            <!-- Python (Blue/Yellow gradient text via class not SVG) - using simple Blue here -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-sky-600/30 bg-sky-600/5 text-sky-400 text-xs font-mono hover:bg-sky-600/10 hover:shadow-[0_0_10px_-3px_rgba(2,132,199,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-8.36l.07-.28.16-.32.25-.34.33-.33.4-.3.45-.25.49-.19.51-.13.51-.07.48-.02zm-5.46 2.37l.48.01.44.11.37.21.28.29.17.37.04.43-.07.45-.22.4-.38.31-.53.21-.57.06-.5-.06-.38-.2-.23-.36-.08-.49.03-.49.19-.43.37-.3.51-.16zm10.9 5.86l.27.02.26.06.32.1.35.16.38.25.34.32.28.38.21.43.14.47.08.5.02.51v3.23l-.04.62-.11.55-.19.47-.25.38-.3.29-.33.21-.35.13-.35.07-.33.02H8.9l-.07-.02-.28-.05-.32-.1-.35-.16-.38-.25-.34-.32-.28-.38-.21-.43-.14-.47-.08-.5-.02-.51v-3.23l.04-.62.11-.55.19-.47.25-.38.3-.29.33-.21.35-.13.35-.07.33-.02h9.85zm-2.07 10.12l.53.05.42.17.3.29.18.4.03.49-.09.47-.24.4-.39.29-.51.18-.54.02-.5-.1-.38-.25-.23-.39-.08-.5.03-.49.19-.42.36-.3.51-.15zm-9.3 2.08l-.16.03-.32.09-.36.13-.36.19-.32.23-.26.29-.2.32-.13.34-.06.35-.01.21v5.18H5.16V15.5l.02-.13.06-.26.11-.3.17-.33.22-.33.28-.32.32-.29.37-.24.39-.18.42-.11.41-.03h6.47l.25.01.32.04.36.09.36.15.34.22.3.29.26.35.19.4.13.43.06.44.01.44v1.89l-.03.27-.08.31-.15.33-.2.33-.27.32-.32.28-.37.23-.4.17-.42.1-.41.03H9.42z"/></svg>
+                                PYTHON
+                            </div>
+                            <!-- Java (Orange) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-orange-600/30 bg-orange-600/5 text-orange-400 text-xs font-mono hover:bg-orange-600/10 hover:shadow-[0_0_10px_-3px_rgba(234,88,12,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M11.66 1.62c-3.13.62-4.5 3.32-2.3 5.4 1.76-2.92 5.06-3.16 2.3-5.4zm3.01 1.96c-4.49 1.07-5.06 5.86-1.55 6.79 3.03-3.08 5.76-3.86 1.55-6.79zm1.74 8.78c-2.47-.6-5.87.16-5.12 3.12 3.52-2.67 7.08-1.51 5.12-3.12zM5.52 13.91c.21 4.71 8.35 2.5 7.6 1.34-3.57 2.22-7.85-.75-7.6-1.34zm-1.07 2.15c.66 5.3 11.23 2.1 10.38.79-4.8 3.5-11.22-.84-10.38-.79zm5.35 4.58c3.92-.02 8.35-1.92 6.55-2.29-2.07 2.22-8.62 2.31-6.55 2.29zm-5.71.69c.8 5.75 14.12 1.93 12.83.42-6.38 4.45-14.24-.95-12.83-.42z"/></svg>
+                                JAVA
+                            </div>
+                            <!-- C (Grey) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-gray-400/30 bg-gray-400/5 text-gray-400 text-xs font-mono hover:bg-gray-400/10 hover:shadow-[0_0_10px_-3px_rgba(156,163,175,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M22.093 17.476c-.663 1.151-1.637 2.1-2.822 2.768-1.298.718-2.73 1.082-4.226 1.082-1.914 0-3.69-.508-5.18-1.422-1.636-1.011-2.836-2.457-3.535-4.144-.663-1.614-.949-3.52-.949-5.747 0-2.318.337-4.247 1.05-5.834.72-1.603 1.905-2.95 3.526-3.92C11.458.747 13.25.26 15.068.26c1.365 0 2.68.293 3.905.865 1.125.534 2.103 1.332 2.85 2.35l-2.43 2.138c-.375-.588-.93-1.09-1.613-1.464-.69-.374-1.564-.567-2.618-.567-1.442 0-2.682.476-3.64 1.391-.842.822-1.47 2.016-1.782 3.496-.153.76-.23 1.838-.23 3.235 0 2.345.313 4.145.927 5.25.66 1.18 1.63 1.77 2.87 1.77 1.056 0 2.031-.303 2.75-.865.626-.486 1.104-1.121 1.4-1.892l2.637 1.51z"/></svg>
+                                C
+                            </div>
+                            <!-- Rust (Orange) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-orange-700/30 bg-orange-700/5 text-orange-500 text-xs font-mono hover:bg-orange-700/10 hover:shadow-[0_0_10px_-3px_rgba(194,65,12,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M23.834 8.101c-.003-.012-.012-.02-.021-.023l-.012-.003c-.015-.003-.027.003-.036.012l-1.152.81c-.12-.543-.33-1.05-.618-1.518l.72-1.215c.003-.015.003-.027-.003-.039a.034.034 0 00-.024-.018l-.012-.003c-.015-.003-.03.003-.039.015l-.732 1.221c-.42-.345-.894-.633-1.41-.855l.216-1.398c.003-.015-.003-.027-.012-.039a.034.034 0 00-.027-.012l-.012-.003c-.015-.003-.03.006-.036.018l-.225 1.41c-.522-.123-1.065-.189-1.62-.189-.552 0-1.095.066-1.617.189l-.225-1.41c-.003-.012-.012-.021-.021-.024l-.012-.003c-.015-.003-.027.003-.036.012-.009.012-.012.024-.009.039l.216 1.398c-.516.222-.99.51-1.41.855l-.732-1.221c-.009-.012-.024-.018-.039-.015l-.012.003c-.012.003-.021.012-.024.021-.003.012-.003.027.003.039l.72 1.215c-.288.468-.498.975-.618 1.518l-1.152-.81c-.012-.009-.027-.012-.039-.009a.032.032 0 00-.021.024l-.003.012c-.003.015.003.027.012.036l1.155.813c-.093.549-.141 1.113-.141 1.689 0 .564.048 1.128.141 1.677l-1.155.813c-.012.009-.015.021-.012.036l.003.012c.003.012.012.021.021.024.012.003.027 0 .039-.009l1.152-.81c.12.543.33 1.05.618 1.518l-.72 1.215c-.003.015-.003.027.003.039a.034.034 0 00.024.018l.012.003c.015.003.03-.003.039-.015l.732-1.221c.42.345.894.633 1.41.855l-.216 1.398c-.003.015.003.027.012.039a.034.034 0 00.027.012l.012.003c.015.003.03-.006.036-.018l.225-1.41c.522.123 1.065.189 1.62.189.552 0 1.095-.066 1.617-.189l.225 1.41c.003.012.012.021.021.024l.012.003c.015.003.027-.003.036-.012.009-.012.012-.024.009-.039l-.216-1.398c.516-.222.99-.51 1.41-.855l.732 1.221c.009.012.024.018.039.015l.012-.003c.012-.003.021-.012.024-.021.003-.012.003-.027-.003-.039l-.72-1.215c.288-.468.498-.975.618-1.518l1.152.81c.012.009.027.012.039.009a.032.032 0 00.021-.024l.003-.012c.003-.015-.003-.027-.012-.036l-1.155-.813c.093-.549.141-1.113.141-1.689 0-.564-.048-1.128-.141-1.677l1.155-.813c.012-.009.015-.021.012-.036zM12 4.5c.552 0 1.095.066 1.617.189l.225-1.41c.003-.012.012-.021.021-.024l.012-.003c.015-.003.027.003.036.012.009.012.012.024.009.039l-.216 1.398c.516.222.99.51 1.41.855l.732-1.221c.009-.012.024-.018.039-.015l.012.003c.012.003.021.012.024.021.003.012.003.027-.003.039l-.72 1.215c.288.468.498.975.618 1.518l1.152-.81c.012-.009.027-.012.039-.009a.032.032 0 00.021.024l.003.012c.003.015-.003.027-.012.036l-1.155.813c.093.549.141 1.113.141 1.689 0 .564-.048 1.128-.141 1.677l1.155.813c.012.009.015.021.012.036l-.003.012c-.003.012-.012.021-.021.024-.012.003-.027 0-.039-.009l-1.152-.81c-.12.543-.33 1.05-.618 1.518l.72 1.215c.003.015.003.027-.003.039a.034.034 0 00-.024.018l-.012.003c-.015.003-.03-.003-.039-.015l-.732-1.221c-.42.345-.894.633-1.41.855l.216 1.398c.003.015-.003.027-.012.039a.034.034 0 00-.027.012l-.012.003c-.015.003-.03-.006-.036-.018l-.225-1.41c-.522.123-1.065.189-1.62.189-.552 0-1.095-.066-1.617-.189l-.225 1.41c-.003.012-.012.021-.021.024l-.012.003c-.015.003-.027-.003-.036-.012-.009-.012-.012-.024-.009-.039l.216-1.398c-.516-.222-.99-.51-1.41-.855l-.732 1.221c-.009.012-.024.018-.039.015l-.012-.003c-.012-.003-.021-.012-.024-.021-.003-.012-.003-.027.003-.039l.72-1.215c-.288-.468-.498-.975-.618-1.518l-1.152.81c-.012.009-.027.012-.039.009a.032.032 0 00-.021-.024l-.003-.012c-.003-.015.003-.027.012-.036l1.155-.813c-.093-.549-.141-1.113-.141-1.689 0-.564.048-1.128.141-1.677l-1.155-.813c-.012-.009-.015-.021-.012-.036l.003-.012c.003-.012.012-.021.021-.024.012-.003.027 0 .039.009l1.152.81c.12-.543.33-1.05.618-1.518l-.72-1.215c-.003-.015-.003-.027.003-.039a.034.034 0 00.024-.018l.012-.003c.015-.003.03.003.039.015l.732 1.221c.42-.345.894-.633 1.41-.855l-.216-1.398c-.003-.015.003-.027.012-.039a.034.034 0 00.027-.012l.012-.003c.015-.003.03.006.036.018l.225 1.41c.522-.123 1.065-.189 1.62-.189zM12 6.75c-2.901 0-5.25 2.349-5.25 5.25s2.349 5.25 5.25 5.25 5.25-2.349 5.25-5.25-2.349-5.25-5.25-5.25zm0 1.5c2.07 0 3.75 1.68 3.75 3.75s-1.68 3.75-3.75 3.75-3.75-1.68-3.75-3.75 1.68-3.75 3.75-3.75z"/></svg>
+                                RUST
+                            </div>
+                            <!-- C++ (Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-blue-600/30 bg-blue-600/5 text-blue-400 text-xs font-mono hover:bg-blue-600/10 hover:shadow-[0_0_10px_-3px_rgba(37,99,235,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M22.394 6c-.167-.29-.398-.543-.652-.69L12.926.22c-.509-.293-1.34-.293-1.848 0L1.26 5.31c-.509.293-.768 1.005-.768 1.56v10.26c0 .555.259 1.267.768 1.56l9.82 5.65c.508.293 1.34.293 1.848 0l9.816-5.654c.509-.293.768-1.005.768-1.56V6.87c0-.54-.215-1.127-.678-1.485zm-1.594 1.27v1.75l-3.75 2.173V7.44zm-.397 1.22l4.146 2.4v8.66l-4.146-2.4zm-9.82 9.98l-4.145-2.4V7.44l4.145 2.4zm-4.543-2.97l3.75-2.173v3.75zm.397-1.22l-4.146-2.4V6.87l4.146 2.4zm.746-1.54l3.75-2.173v3.75zm4.543-4.15v8.66l-4.145-2.4V7.44zm4.543 6.41l-3.75 2.173v-3.75zm0-4.15l-3.75 2.173V7.44zm-9.836-2.4l4.146-2.4v12.8zm9.836 0v12.8l-4.146-2.4zm-5.443-3.12l4.146-2.4 4.146 2.4-4.146 2.4z"/></svg>
+                                C++
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frontend -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-mono text-studio-muted/70 tracking-wider uppercase">Frontend</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Vue.js (Green) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-xs font-mono hover:bg-emerald-500/10 hover:shadow-[0_0_10px_-3px_rgba(16,185,129,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M24,1.61H14.06L12,5.16,9.94,1.61H0L12,22.39ZM12,14.08,5.16,2.23H9.59L12,6.41l2.41-4.18h4.43Z"/></svg>
+                                VUE.JS
+                            </div>
+                            <!-- React (Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-cyan-400/30 bg-cyan-400/5 text-cyan-400 text-xs font-mono hover:bg-cyan-400/10 hover:shadow-[0_0_10px_-3px_rgba(34,211,238,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.2c1.785 0 3.325.545 4.31 1.417-1.58.423-3.14.73-4.31.73-1.17 0-2.73-.307-4.31-.73 1.02-.9 2.525-1.417 4.31-1.417zm0 1.933c1.94 0 3.843.52 5.347 1.365-.776 1.432-1.957 2.502-3.328 3.16-2.02-.912-4.04-1.748-2.02-2.76 2.02 1.012 0 1.85-.776-3.328-3.16 1.504-.845 3.407-1.365 5.347-1.365zM12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5zm0 1.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 8.5c-1.94 0-3.843-.52-5.347-1.365.776-1.432 1.957-2.502 3.328-3.16 2.02.912 4.04 1.748 2.02 2.76-2.02-1.012 0-1.85.776 3.328 3.16-1.504.845-3.407 1.365-5.347 1.365zm0 1.933c-1.785 0-3.325-.545-4.31-1.417 1.58-.423 3.14-.73 4.31-.73 1.17 0 2.73.307 4.31.73-1.02.9-2.525 1.417-4.31 1.417z"/></svg>
+                                REACT
+                            </div>
+                            <!-- Electron (Dark Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-indigo-400/30 bg-indigo-400/5 text-indigo-300 text-xs font-mono hover:bg-indigo-400/10 hover:shadow-[0_0_10px_-3px_rgba(129,140,248,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 1.838c-5.518 0-9.855 3.65-10.74 8.65h2.152c.868-3.9 4.39-6.85 8.588-6.85 4.97 0 9 4.03 9 9s-4.03 9-9 9c-4.198 0-7.72-2.95-8.588-6.85H1.26c.885 5 5.223 8.65 10.74 8.65 6.074 0 11-4.925 11-11s-4.926-11-11-11Z"/></svg>
+                                ELECTRON
+                            </div>
+                            <!-- Tauri (Cyan/Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-sky-400/30 bg-sky-400/5 text-sky-300 text-xs font-mono hover:bg-sky-400/10 hover:shadow-[0_0_10px_-3px_rgba(56,189,248,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M11.33 1.333L.16 12.502l11.17 11.17 11.17-11.17L11.33 1.333zm0 2.828l8.342 8.341-8.342 8.342-8.341-8.342 8.341-8.341zM11.33 7.5a5.002 5.002 0 00-5 5 5.002 5.002 0 005 5 5.002 5.002 0 005-5 5.002 5.002 0 00-5-5z"/></svg>
+                                TAURI
+                            </div>
+                            <!-- CSS3 (Blue) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-blue-500/30 bg-blue-500/5 text-blue-400 text-xs font-mono hover:bg-blue-500/10 hover:shadow-[0_0_10px_-3px_rgba(59,130,246,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.564-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622L5.412 4.41l.698 8.01h9.126l-.325 3.426-2.91.804-2.955-.81-.188-2.11H6.248l.33 4.171L12 19.351l5.379-1.443.744-8.157H8.531z"/></svg>
+                                CSS3
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backend & Tools -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-mono text-studio-muted/70 tracking-wider uppercase">Backend & Tools</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Spring Boot (Green) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-green-500/30 bg-green-500/5 text-green-400 text-xs font-mono hover:bg-green-500/10 hover:shadow-[0_0_10px_-3px_rgba(34,197,94,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm5.83 17.555-1.253.945c-.868.653-2.078.69-2.936-.08l-5.656-5.088c-.858-.77-1.123-1.96-.583-2.61l1.253-.946c.54-.406 1.182-.24 1.722.246l5.656 5.088c.54.485.655 1.393.115 1.8zm2.668-3.535-1.253.946c-.868.653-2.078.69-2.937-.08l-5.655-5.088c-.858-.772-1.123-1.96-.583-2.612l1.253-.945c.54-.406 1.182-.24 1.722.246l5.656 5.088c.54.486.655 1.394.115 1.801z"/></svg>
+                                SPRING BOOT
+                            </div>
+                            <!-- Node.js (Green) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-green-600/30 bg-green-600/5 text-green-500 text-xs font-mono hover:bg-green-600/10 hover:shadow-[0_0_10px_-3px_rgba(22,163,74,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12.004.004C5.372.004 0 5.38 0 12.004c0 6.623 5.372 12 12.004 12 6.627 0 12-5.377 12-12C24.004 5.38 18.631.004 12.004.004zm5.558 16.924c-1.442.846-2.583 1.135-4.04 1.135-2.076 0-3.325-.865-3.325-2.885v-4.134h-1.692v-1.692h1.692V7.158l2.557-1.538v3.73h2.615v1.693h-2.615v3.422c0 .942.5 1.25 1.384 1.25.692 0 1.25-.212 1.634-.442l1.79 1.654z"/></svg>
+                                NODE.JS
+                            </div>
+                            <!-- FastAPI (Teal/Green) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-teal-500/30 bg-teal-500/5 text-teal-400 text-xs font-mono hover:bg-teal-500/10 hover:shadow-[0_0_10px_-3px_rgba(20,184,166,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.2c1.785 0 3.325.545 4.31 1.417-1.58.423-3.14.73-4.31.73-1.17 0-2.73-.307-4.31-.73 1.02-.9 2.525-1.417 4.31-1.417zm0 1.933c1.94 0 3.843.52 5.347 1.365-.776 1.432-1.957 2.502-3.328 3.16-2.02-.912-4.04-1.748-2.02-2.76 2.02 1.012 0 1.85-.776-3.328-3.16 1.504-.845 3.407-1.365 5.347-1.365zM12 7c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5zm0 1.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 8.5c-1.94 0-3.843-.52-5.347-1.365.776-1.432 1.957-2.502 3.328-3.16 2.02.912 4.04 1.748 2.02 2.76-2.02-1.012 0-1.85.776 3.328 3.16-1.504.845-3.407 1.365-5.347 1.365zm0 1.933c-1.785 0-3.325-.545-4.31-1.417 1.58-.423 3.14-.73 4.31-.73 1.17 0 2.73.307 4.31.73-1.02.9-2.525 1.417-4.31 1.417z"/></svg>
+                                FASTAPI
+                            </div>
+                            <!-- PyTorch (Orange) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-orange-500/30 bg-orange-500/5 text-orange-400 text-xs font-mono hover:bg-orange-500/10 hover:shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M17.41 1.742C17.41 1.296 17.067.925 16.634.881A40.06 40.06 0 0 0 11.96 11.986c-4.116 1.737-7.777 3.39-7.792 3.396-.109.049-.17.158-.152.274a.294.294 0 0 0 .285.244c.007 0 2.585-.145 7.643-2.147l3.877 8.356c.143.308.577.33.753.037.135-.224 5.86-9.774 5.86-9.774.204-.34-.05-.776-.445-.776h-5.467l.872-9.431c.045-.487-.33-.919-.82-.919z"/></svg>
+                                PYTORCH
+                            </div>
+                            <!-- Shell Script (Gray) -->
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-slate-500/30 bg-slate-500/5 text-slate-400 text-xs font-mono hover:bg-slate-500/10 hover:shadow-[0_0_10px_-3px_rgba(100,116,139,0.3)] transition-all cursor-default">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 19V7H4v12h16zM4 5h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2zM8 10l3 3-3 3v-6zm4 5h6v1H12v-1z"/></svg>
+                                SHELL SCRIPT
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emotional / Audio (Right Column) -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-medium text-studio-text flex items-center gap-2 font-serif italic">
+                        <span class="w-1.5 h-1.5 bg-studio-warm rounded-full shadow-[0_0_8px_rgba(212,180,131,0.4)]"></span>
+                        Audio
+                    </h3>
+                    <ul class="space-y-2 text-sm text-studio-muted font-light">
+                        <li class="border-l border-studio-warm/20 pl-4 py-1">Dolby Atmos Mixing & Rendering</li>
+                        <li class="border-l border-studio-warm/20 pl-4 py-1">Stereo Audio Remastering</li>
+                        <li class="border-l border-studio-warm/20 pl-4 py-1">Dynamic Range Restoration</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Projects Section -->
+        <section id="projects" class="space-y-8 scroll-mt-32">
+            <h2 class="text-xs font-mono text-studio-muted tracking-widest border-b border-white/5 pb-2 uppercase">03 / Projects</h2>
+            
+            <div class="grid gap-4">
+                <!-- Project Card 1: Dolby Encoder GUI -->
+                <a href="https://github.com/chyinan/dolby-encoder-gui" target="_blank" class="group block p-6 border border-white/5 bg-white/[0.02] rounded-2xl hover:border-studio-warm/30 hover:shadow-[0_0_30px_-5px_rgba(212,180,131,0.1)] transition-all duration-500">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-normal text-studio-text group-hover:text-studio-warm transition-colors font-mono">Dolby Encoder GUI</h3>
+                        <span class="text-[10px] font-mono border border-white/10 px-1.5 py-0.5 rounded text-studio-muted">AUDIO DEV</span>
+                    </div>
+                    <p class="text-sm text-studio-muted font-light mb-4 leading-relaxed">
+                        <span class="data-lang-zh">为复杂的杜比全景声编码流程赋予一个直观、可视化的控制台。</span>
+                        <span class="data-lang-en lang-hidden">Giving a complex Dolby Atmos encoding workflow an intuitive, visual console.</span>
+                    </p>
+                    <div class="text-xs font-mono text-studio-muted/60">#DolbyAtmos #GUI #Python</div>
+                </a>
+
+                <!-- Project Card 2: Soundscape -->
+                <a href="https://github.com/chyinan/Soundscape" target="_blank" class="group block p-6 border border-white/5 bg-white/[0.02] rounded-2xl hover:border-studio-warm/30 hover:shadow-[0_0_30px_-5px_rgba(212,180,131,0.1)] transition-all duration-500">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-normal text-studio-text group-hover:text-studio-warm transition-colors font-mono">Soundscape</h3>
+                        <span class="text-[10px] font-mono border border-white/10 px-1.5 py-0.5 rounded text-studio-muted">EXPERIMENT</span>
+                    </div>
+                    <p class="text-sm text-studio-muted font-light mb-4 leading-relaxed">
+                        <span class="data-lang-zh">沉浸式声景构建，探索听觉空间与情感的连接。</span>
+                        <span class="data-lang-en lang-hidden">Immersive soundscape construction, exploring the connection between auditory space and emotion.</span>
+                    </p>
+                    <div class="text-xs font-mono text-studio-muted/60">#SpatialAudio #Ambient</div>
+                </a>
+
+                <!-- Project Card 3: UVR Headless Runner -->
+                <a href="https://github.com/chyinan/uvr-headless-runner" target="_blank" class="group block p-6 border border-white/5 bg-white/[0.02] rounded-2xl hover:border-studio-warm/30 hover:shadow-[0_0_30px_-5px_rgba(212,180,131,0.1)] transition-all duration-500">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-normal text-studio-text group-hover:text-studio-warm transition-colors font-mono">UVR Headless Runner</h3>
+                        <span class="text-[10px] font-mono border border-white/10 px-1.5 py-0.5 rounded text-studio-muted">AUDIO DEV / AI</span>
+                    </div>
+                    <p class="text-sm text-studio-muted font-light mb-4 leading-relaxed">
+                        <span class="data-lang-zh">于寂静处，音轨解构，赋声以纯粹之形。</span>
+                        <span class="data-lang-en lang-hidden">In the quietude, audio tracks deconstruct, bestowing pure form upon sound.</span>
+                    </p>
+                    <div class="text-xs font-mono text-studio-muted/60">#AudioSeparation #Python #CLI #AI</div>
+                </a>
+
+                <!-- Project Card 4: Internal Recorder -->
+                <a href="https://github.com/chyinan/Internal-Recorder" target="_blank" class="group block p-6 border border-white/5 bg-white/[0.02] rounded-2xl hover:border-studio-warm/30 hover:shadow-[0_0_30px_-5px_rgba(212,180,131,0.1)] transition-all duration-500">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-normal text-studio-text group-hover:text-studio-warm transition-colors font-mono">Internal Recorder</h3>
+                        <span class="text-[10px] font-mono border border-white/10 px-1.5 py-0.5 rounded text-studio-muted">AUDIO DEV</span>
+                    </div>
+                    <p class="text-sm text-studio-muted font-light mb-4 leading-relaxed">
+                        <span class="data-lang-zh">让系统声音的捕捉变得像呼吸一样自然。在复杂与简单之间，选择后者。</span>
+                        <span class="data-lang-en lang-hidden">Making system audio capture as natural as breathing. Between complexity and simplicity, choosing the latter.</span>
+                    </p>
+                    <div class="text-xs font-mono text-studio-muted/60">#Windows #Flutter #C++ #WASAPI #AudioRecording</div>
+                </a>
+                <!-- Project Card 5: Kokoro Engine -->
+                <a href="https://github.com/chyinan/Kokoro-Engine" target="_blank" class="group block p-6 border border-white/5 bg-white/[0.02] rounded-2xl hover:border-studio-warm/30 hover:shadow-[0_0_30px_-5px_rgba(212,180,131,0.1)] transition-all duration-500">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-normal text-studio-text group-hover:text-studio-warm transition-colors font-mono">Kokoro Engine</h3>
+                        <span class="text-[10px] font-mono border border-white/10 px-1.5 py-0.5 rounded text-studio-muted">AI / DESKTOP</span>
+                    </div>
+                    <p class="text-sm text-studio-muted font-light mb-4 leading-relaxed">
+                        <span class="data-lang-zh">屏幕之上，赋予虚拟角色以心跳、记忆与凝视。</span>
+                        <span class="data-lang-en lang-hidden">On screen, granting virtual characters a heartbeat, memory, and gaze.</span>
+                    </p>
+                    <div class="text-xs font-mono text-studio-muted/60">#Tauri #Rust #Live2D #LLM #TTS</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- 5. Works / Audio Section -->
+        <section id="audio" class="space-y-8 scroll-mt-32">
+            <h2 class="text-xs font-mono text-studio-muted tracking-widest border-b border-white/5 pb-2 uppercase">04 / Audio Works</h2>
+            
+            <div class="border-l-2 border-white/10 pl-6 py-2 space-y-6 hover:border-studio-warm transition-colors duration-700">
+                <div>
+                    <h3 class="text-2xl font-normal text-studio-text font-serif italic">
+                        <span class="data-lang-zh">NERX修复企划</span>
+                        <span class="data-lang-en lang-hidden">NERX Repair Plan</span>
+                    </h3>
+                    <div class="flex gap-4 mt-2 font-mono text-[10px] text-studio-muted tracking-wider uppercase">
+                        <span>Logic Pro X</span>
+                        <span>//</span>
+                        <span>Dolby Atmos</span>
+                        <span>//</span>
+                        <span>2025</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-sm font-light text-studio-muted leading-relaxed max-w-xl">
+                    <p>
+                        <strong class="text-studio-text font-normal font-sans">
+                            <span class="data-lang-zh">背景:</span>
+                            <span class="data-lang-en lang-hidden">Background:</span>
+                        </strong> 
+                        <span class="data-lang-zh">在当下的响度战争中，音乐的起伏被无情压缩。我们听到的往往是“响亮”的波形，而非“呼吸”的音乐。</span>
+                        <span class="data-lang-en lang-hidden">In the current loudness war, the dynamics of music are ruthlessly compressed. What we hear is often a 'loud' waveform, not 'breathing' music.</span>
+                    </p>
+                    <p>
+                        <strong class="text-studio-text font-normal font-sans">
+                            <span class="data-lang-zh">目标:</span>
+                            <span class="data-lang-en lang-hidden">Objective:</span>
+                        </strong> 
+                        <span class="data-lang-zh">利用杜比全景声（Dolby Atmos）的高宽容度，解构原有分轨，重建动态余量。</span>
+                        <span class="data-lang-en lang-hidden">Leveraging the high headroom of Dolby Atmos to deconstruct original stems and rebuild dynamic range.</span>
+                    </p>
+                    <p>
+                        <strong class="text-studio-text font-normal font-sans">
+                            <span class="data-lang-zh">监听:</span>
+                            <span class="data-lang-en lang-hidden">Monitoring:</span>
+                        </strong> 
+                        Logic Pro -> AirPods Pro 2 (Head Tracking On). <br>
+                        <span class="data-lang-zh"><span class="italic opacity-60 font-serif">确保在消费级设备上也能传递出录音棚级别的临场感。</span></span>
+                        <span class="data-lang-en lang-hidden"><span class="italic opacity-60 font-serif">Ensuring studio-level presence is delivered even on consumer devices.</span></span>
+                    </p>
+                </div>
+                
+                <div class="pt-4 border-t border-white/5">
+                    <a href="https://chyinan.github.io/immersive-audio/" target="_blank" class="inline-flex items-center gap-2 text-sm font-mono text-studio-muted hover:text-studio-warm transition-colors duration-300 group">
+                        <span class="data-lang-zh">了解更多</span>
+                        <span class="data-lang-en lang-hidden">Learn More</span>
+                        <span class="opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">→</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-white/5 py-12 text-center">
+        <div class="space-y-4">
+            <div class="flex justify-center gap-6 text-sm font-mono text-studio-muted">
+                <a href="https://github.com/chyinan" class="hover:text-studio-warm transition-colors">GITHUB</a>
+                <a href="https://space.bilibili.com/1778408540" target="_blank" class="hover:text-studio-warm transition-colors">BILIBILI</a>
+                <a href="mailto:chyinan2015@gmail.com" class="hover:text-studio-warm transition-colors">EMAIL</a>
+            </div>
+            <p class="text-[10px] text-studio-muted/40 font-mono">
+                DESIGNED & CODED BY ASAKAWA KAEDE © 2026<br>
+                NO TEMPLATES. PURE HTML & TAILWIND.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('lang-toggle');
+            const zhElements = document.querySelectorAll('.data-lang-zh');
+            const enElements = document.querySelectorAll('.data-lang-en');
+            
+            // Check stored preference or default to 'zh'
+            let currentLang = localStorage.getItem('site-lang') || 'zh';
+            
+            // Function to update visibility
+            function updateLanguage(lang) {
+                if (lang === 'zh') {
+                    zhElements.forEach(el => el.classList.remove('lang-hidden'));
+                    enElements.forEach(el => el.classList.add('lang-hidden'));
+                    document.documentElement.lang = 'zh-CN';
+                } else {
+                    zhElements.forEach(el => el.classList.add('lang-hidden'));
+                    enElements.forEach(el => el.classList.remove('lang-hidden'));
+                    document.documentElement.lang = 'en';
+                }
+                localStorage.setItem('site-lang', lang);
+                currentLang = lang;
+            }
+
+            // Initial set
+            updateLanguage(currentLang);
+
+            // Toggle Event
+            toggleBtn.addEventListener('click', () => {
+                const newLang = currentLang === 'zh' ? 'en' : 'zh';
+                updateLanguage(newLang);
+            });
+        });
+    </script>
+
+</body>
+</html>
